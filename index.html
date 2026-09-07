@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حركات بهلوانية | Acrobatic Legend</title>
+    
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #ff0055;
+            --secondary: #7928ca;
+            --cyan: #00dfd8;
+            --bg-dark: #05050a;
+            --card-bg: rgba(20, 20, 35, 0.6);
+            --border-glow: rgba(255, 0, 85, 0.3);
+            --text-light: #f4f4f9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        /* Background Particle Canvas */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 4rem;
+            background: rgba(5, 5, 10, 0.8);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--cyan);
+        }
+
+        /* Hero Section */
+        header {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 1rem;
+            position: relative;
+        }
+
+        .hero-badge {
+            background: rgba(255, 0, 85, 0.1);
+            border: 1px solid var(--primary);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            color: var(--primary);
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        h1 {
+            font-size: 5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            background: linear-gradient(45deg, #fff 30%, var(--primary), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        p.subtitle {
+            font-size: 1.4rem;
+            color: #aaa;
+            max-width: 700px;
+            margin-bottom: 2.5rem;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            color: #fff;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border: none;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 35px rgba(255, 0, 85, 0.8);
+        }
+
+        .btn-secondary {
+            color: #fff;
+            background: transparent;
+            border: 2px solid var(--cyan);
+            box-shadow: 0 0 15px rgba(0, 223, 216, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: var(--cyan);
+            color: #000;
+            transform: translateY(-5px);
+            box-shadow: 0 0 30px rgba(0, 223, 216, 0.6);
+        }
+
+        /* Stats Counter Section */
+        .stats-section {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            max-width: 1100px;
+            margin: -4rem auto 5rem;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 10;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: var(--cyan);
+            display: block;
+        }
+
+        .stat-label {
+            color: #aaa;
+            font-size: 1rem;
+        }
+
+        /* Content Sections */
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 3rem;
+            background: linear-gradient(45deg, var(--primary), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            transition: 0.5s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(255, 0, 85, 0.2);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .card h3 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .card p {
+            color: #b0b0c0;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-tag {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(0, 223, 216, 0.1);
+            color: var(--cyan);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        /* Interactive Physics Sandbox Section */
+        .interactive-container {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 2rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            margin-top: 4rem;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 0.6rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .control-btn:hover, .control-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.5);
+        }
+
+        canvas#acroCanvas {
+            width: 100%;
+            height: 450px;
+            border-radius: 15px;
+            background: #020205;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: crosshair;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: #020205;
+            color: #777;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; }
+            nav { padding: 1rem 1.5rem; }
+            .nav-links { display: none; }
+            .stats-section { flex-direction: column; gap: 2rem; margin-top: 2rem; }
+            .cta-group { flex-direction: column; width: 100%; }
+            .btn { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dynamic Particle Background Canvas -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo"><i class="fa-solid fa-bolt"></i> حركات بهلوانية</div>
+        <ul class="nav-links">
+            <li><a href="#skills">المهارات</a></li>
+            <li><a href="#sandbox">المختبر التفاعلي</a></li>
+            <li><a href="#stats">الأرقام</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <header>
+        <div class="hero-badge"><i class="fa-solid fa-fire"></i> المنصة الرقمية الأولى للاستعراض الحر</div>
+        <h1>تحدى الجاذبية وارتقِ بمهاراتك</h1>
+        <p class="subtitle">تغلب على الخوف، أتقن المهارات البهلوانية، وتعلم أسرار التحكم الكامل بالجسد والمرونة المطلقة عبر تدريبات فيزيائية محاكاة.</p>
+        <div class="cta-group">
+            <a href="#sandbox" class="btn btn-primary"><i class="fa-solid fa-play"></i> ابدأ العرض التفاعلي</a>
+            <a href="#skills" class="btn btn-secondary"><i class="fa-solid fa-compass"></i> استكشف المهارات</a>
+        </div>
+    </header>
+
+    <!-- Stats Counter -->
+    <div class="stats-section" id="stats">
+        <div class="stat-item">
+            <span class="stat-number" data-target="99.9">0</span>%
+            <span class="stat-label">تحدي الجاذبية</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" data-target="360">0</span>°
+            <span class="stat-label">دوران حر بالهواء</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" data-target="1500">0</span>+
+            <span class="stat-label">حركة واكاديمية</span>
+        </div>
+    </div>
+
+    <!-- Main Content / Skills Grid -->
+    <div class="container" id="skills">
+        <h2 class="section-title">ترسانة المهارات البهلوانية</h2>
+        <div class="grid">
+            
+            <div class="card">
+                <i class="fa-solid fa-rotate-left card-icon"></i>
+                <h3>الشقلبة الخلفية | Backflip</h3>
+                <p>الحركة الأيقونية الأكثر شهرة. تتطلب التغلب على الخوف النفسي، الاعتماد على اندفاع الركبتين، وقوة الجذع للالتفاف الكامل.</p>
+                <span class="card-tag">مستوى: متوسط</span>
+            </div>
+
+            <div class="card">
+                <i class="fa-solid fa-hand-holding-hand card-icon" style="color: var(--cyan);"></i>
+                <h3>الوقوف على اليدين | Handstand</h3>
+                <p>أساس كل العلوم البهلوانية. تعتمد على محاذاة كتفيك مع الحوض وتعديل التوازن الدقيق باستخدام أصابع اليدين.</p>
+                <span class="card-tag">مستوى: أساسي</span>
+            </div>
+
+            <div class="card">
+                <i class="fa-solid fa-person-running card-icon" style="color: var(--secondary);"></i>
+                <h3>شقلبة الجدار | Wall Flip</h3>
+                <p>استغلال الجاذبية والجدار للحصول على مرتد عمودي قوي للالتفاف في الهواء بأسلوب الشارع (Tricking).</p>
+                <span class="card-tag">مستوى: متقدم</span>
+            </div>
+
+            <div class="card">
+                <i class="fa-solid fa-child-reaching card-icon"></i>
+                <h3>المرونة المطلقة | Split & Bridge</h3>
+                <p>فتح الحوض والجسر الخلفي. مفتاح الحماية من الإصابات وتسهيل أداء الحركة الانسيابية أثناء الدوران.</p>
+                <span class="card-tag">مستوى: شامل</span>
+            </div>
+
+            <div class="card">
+                <i class="fa-solid fa-wind card-icon" style="color: var(--cyan);"></i>
+                <h3>الحركة الحلزونية | Corkscrew</h3>
+                <p>دوران بهلواني معقد يجمع بين القفز بجمباز القدم الواحدة مع لف الجسم 360 درجة أفقياً في الهواء.</p>
+                <span class="card-tag">مستوى: أسطوري</span>
+            </div>
+
+            <div class="card">
+                <i class="fa-solid fa-shield-halved card-icon" style="color: var(--secondary);"></i>
+                <h3>هبوط الأمان | Parkour Roll</h3>
+                <p>المهارة التي تحميك عند السقوط من ارتفاعات عالية، عن طريق تحويل الصدمة العمودية إلى طاقة حركة دورانية.</p>
+                <span class="card-tag">مستوى: دفاعي</span>
+            </div>
+
+        </div>
+
+        <!-- Interactive Physics Canvas Section -->
+        <div class="interactive-container" id="sandbox">
+            <h2 class="section-title" style="margin-bottom: 1rem;">مختبر الفيزيائيات التفاعلي</h2>
+            <p style="color: #aaa; margin-bottom: 1.5rem;">حرك الماوس أو انقر داخل الساحة لتوليد حركات بهلوانية وجسيمات طاقة تتأثر بالفيزياء الدائرية!</p>
+            
+            <div class="controls">
+                <button class="control-btn active" onclick="setMode('fireworks')">انفجار بهلواني</button>
+                <button class="control-btn" onclick="setMode('vortex')">دوامة الجاذبية</button>
+                <button class="control-btn" onclick="setMode('ribbon')">أشرطة المرونة</button>
+                <button class="control-btn" onclick="clearCanvas()">مسح الساحة</button>
+            </div>
+
+            <canvas id="acroCanvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>جميع الحقوق محفوظة &copy; 2026 | عالم الحركات البهلوانية والرياضات الاستعراضية</p>
+    </footer>
+
+    <!-- Interactive Scripts -->
+    <script>
+        // --- 1. Background Floating Particles ---
+        const bgCanvas = document.getElementById('bgCanvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let bgParticles = [];
+
+        function resizeBg() {
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeBg);
+        resizeBg();
+
+        class BgParticle {
+            constructor() {
+                this.x = Math.random() * bgCanvas.width;
+                this.y = Math.random() * bgCanvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > bgCanvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > bgCanvas.height) this.speedY *= -1;
+            }
+            draw() {
+                bgCtx.fillStyle = `rgba(0, 223, 216, ${this.opacity})`;
+                bgCtx.beginPath();
+                bgCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                bgCtx.fill();
+            }
+        }
+
+        for (let i = 0; i < 70; i++) bgParticles.push(new BgParticle());
+
+        function animateBg() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            bgParticles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+        // --- 2. Stats Animated Counter ---
+        const counters = document.querySelectorAll('.stat-number');
+        let started = false;
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 200 && !started) {
+                counters.forEach(counter => {
+                    const target = +counter.getAttribute('data-target');
+                    const duration = 2000;
+                    const step = target / (duration / 16);
+                    let current = 0;
+
+                    const updateCount = () => {
+                        current += step;
+                        if (current < target) {
+                            counter.innerText = current.toFixed(target % 1 !== 0 ? 1 : 0);
+                            setTimeout(updateCount, 16);
+                        } else {
+                            counter.innerText = target;
+                        }
+                    };
+                    updateCount();
+                });
+                started = true;
+            }
+        });
+
+        // --- 3. Interactive Physics Sandbox Canvas ---
+        const canvas = document.getElementById('acroCanvas');
+        const ctx = canvas.getContext('2d');
+        let mode = 'fireworks';
+        let particles = [];
+
+        function resizeMainCanvas() {
+            canvas.width = canvas.parentElement.clientWidth - 60;
+            canvas.height = 450;
+        }
+        window.addEventListener('resize', resizeMainCanvas);
+        resizeMainCanvas();
+
+        function setMode(newMode) {
+            mode = newMode;
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function clearCanvas() {
+            particles = [];
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        class InteractiveParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 6 + 2;
+                this.speedX = (Math.random() - 0.5) * 10;
+                this.speedY = (Math.random() - 0.5) * 10;
+                this.gravity = 0.15;
+                this.color = mode === 'ribbon' ? '#00dfd8' : `hsl(${Math.random() * 60 + 330}, 100%, 50%)`;
+                this.life = 1;
+                this.decay = Math.random() * 0.02 + 0.01;
+                this.angle = Math.random() * Math.PI * 2;
+            }
+
+            update() {
+                if (mode === 'fireworks') {
+                    this.speedY += this.gravity;
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                } else if (mode === 'vortex') {
+                    this.angle += 0.05;
+                    this.x += Math.cos(this.angle) * 4 + this.speedX * 0.2;
+                    this.y += Math.sin(this.angle) * 4 + this.speedY * 0.2;
+                } else if (mode === 'ribbon') {
+                    this.x += this.speedX * 0.5;
+                    this.y += this.speedY * 0.5;
+                }
+                this.life -= this.decay;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function spawnParticles(x, y, count = 5) {
+            for (let i = 0; i < count; i++) {
+                particles.push(new InteractiveParticle(x, y));
+            }
+        }
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            spawnParticles(e.clientX - rect.left, e.clientY - rect.top, 2);
+        });
+
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            spawnParticles(e.clientX - rect.left, e.clientY - rect.top, 30);
+        });
+
+        function animateMain() {
+            ctx.fillStyle = 'rgba(2, 2, 5, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animateMain);
+        }
+        animateMain();
+    </script>
+</body>
+</html>
